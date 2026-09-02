@@ -9,11 +9,11 @@ from ptych.core.metric_plots import save_metrics_summary
 from ptych.data.utils import get_default_device
 
 # Select dataset
-dataset = "usaf-test-dark"
+dataset = "datasets/20260728-122052-Bar Pattern"
 
-CROP_SIZE = 416  # should be the same as PATCH_SIZE if practical
-CROP_TOP = 1024
-CROP_LEFT = 1440
+CROP_SIZE = 616  # 616px window in the 1232x1232 frame
+CROP_TOP = 0
+CROP_LEFT = 128  # 512px shift in the 4x output
 DARK_SUBTRACTION = "average_all"  # "average_all" or "nearest_only"
 
 # Reconstruction model settings
@@ -23,7 +23,7 @@ PUPIL_AMPLITUDE_RADIAL_ORDER = 0
 
 # Memory/scaling settings
 PATCH_SIZE = 416  # prefer power of 2 or 384, 416, 448, 480, 512
-PATCH_BATCH_SIZE = 16
+PATCH_BATCH_SIZE = 1  # 4 patches at 416px OOM on MPS when batched together
 ILLUMINATION_CHUNK_SIZE = 145
 
 # Runtime settings
@@ -38,7 +38,7 @@ LEARNING_RATES = SolverLearningRates(
 
 # Output directory
 timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
-OUTPUT_DIR = Path(f"results/{dataset}-{timestamp}")
+OUTPUT_DIR = Path(f"results/{Path(dataset).name}-{timestamp}")
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 study = PtychStudy.load(

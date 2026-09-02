@@ -15,3 +15,6 @@ build/
 results/
 
 .DS_Store
+
+# Local dataset copies
+datasets/
