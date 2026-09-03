@@ -15,6 +15,8 @@ CROP_SIZE = 616  # 616px window in the 1232x1232 frame
 CROP_TOP = 0
 CROP_LEFT = 128  # 512px shift in the 4x output
 DARK_SUBTRACTION = "average_all"  # "average_all" or "nearest_only"
+# Debug: persist every preprocessed capture, not just the first.
+SAVE_ALL_CAPTURES = True
 
 # Reconstruction model settings
 OBJECT_TO_CAPTURE_RATIO = 4  # prefer 2 or 4
@@ -47,6 +49,17 @@ study = PtychStudy.load(
     dark_subtraction=DARK_SUBTRACTION,
 )
 
+# Persist preprocessed captures under their original dataset filenames.
+captures_dir = OUTPUT_DIR / "captures"
+captures_dir.mkdir(exist_ok=True)
+saved_capture_count = len(study.captures) if SAVE_ALL_CAPTURES else 1
+for capture, metadata in zip(
+    study.captures[:saved_capture_count],
+    study.capture_metadata[:saved_capture_count],
+    strict=True,
+):
+    np.save(captures_dir / metadata.filename, capture.numpy())
+
 # Get GPU
 TORCH_DEVICE = get_default_device()
 print(f"Using torch device: {TORCH_DEVICE}")
@@ -68,7 +81,6 @@ result = solve_study(
 # Save reconstruction artifacts.
 metrics_plot_path = OUTPUT_DIR / "reconstruction_metrics.png"
 object_path = OUTPUT_DIR / "object.npy"
-capture_path = OUTPUT_DIR / "capture_0.npy"
 metrics_json_path = OUTPUT_DIR / "metrics.json"
 
 save_metrics_summary(
@@ -77,13 +89,12 @@ save_metrics_summary(
 )
 
 np.save(object_path, result.object.cpu().numpy())
-np.save(capture_path, result.capture_0.cpu().numpy())
 with metrics_json_path.open("w") as file:
     json.dump(result.metrics, file)
 
 print("Reconstruction complete!")
 print(f"Reconstructed object tensor: {result.object.shape}")
 print(f"Saved object: {object_path}")
-print(f"Saved capture: {capture_path}")
+print(f"Saved {saved_capture_count} preprocessed capture(s): {captures_dir}")
 print(f"Saved metrics JSON: {metrics_json_path}")
 print(f"Saved metrics plot: {metrics_plot_path}")

@@ -28,7 +28,6 @@ class SolverLearningRates:
 @dataclass
 class StudySolveResult:
     object: Complex[Tensor, "object_height object_width"]
-    capture_0: Float[Tensor, "height width"]
     pupils: dict[tuple[int, int], Complex[Tensor, "object_height object_width"]]
     metrics: list[BatchMetricsRecord]
 
@@ -325,12 +324,9 @@ def solve_study(
     learning_rates: SolverLearningRates = SolverLearningRates(),
 ) -> StudySolveResult:
 
-    capture_0 = study.captures[0]
-    capture_0_metadata = study.capture_metadata[0]
-
     pupil_cutoff_cyc_per_px = pupil_cutoff_cyc_per_px_from_optics(
         numerical_aperture=study.manifest.numerical_aperture,
-        wavelength_m=capture_0_metadata.wavelength,
+        wavelength_m=study.capture_metadata[0].wavelength,
         sensor_pixel_size_m=study.manifest.sensor_pixel_size,
         magnification=study.manifest.magnification,
         object_to_capture_ratio=object_to_capture_ratio,
@@ -405,7 +401,6 @@ def solve_study(
 
     return StudySolveResult(
         object=object_tensor,
-        capture_0=capture_0.detach().cpu(),
         pupils=pupils,
         metrics=metrics,
     )
