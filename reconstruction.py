@@ -25,7 +25,9 @@ PUPIL_AMPLITUDE_RADIAL_ORDER = 0
 
 # Memory/scaling settings
 PATCH_SIZE = 416  # prefer power of 2 or 384, 416, 448, 480, 512
-PATCH_BATCH_SIZE = 1  # 4 patches at 416px OOM on MPS when batched together
+PATCH_BATCH_SIZE = 1
+# Each chunk re-samples the object's oversampled spectrum, so one chunk covering
+# every illumination is cheapest unless memory-bound.
 ILLUMINATION_CHUNK_SIZE = 145
 
 # Runtime settings

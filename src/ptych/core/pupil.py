@@ -6,7 +6,10 @@ import torch.nn.functional as F
 from jaxtyping import Complex
 from torch import Tensor
 
+from ptych.core.forward import SpectralWindow
 from ptych.core.zernike import zernike_basis_tensors, zernike_num_terms
+
+DEFAULT_EDGE_WIDTH_PX = 0.5
 
 
 def _radius_logit(
@@ -36,9 +39,11 @@ def _init_tensor(value: Tensor | float) -> Tensor:
 
 
 class Pupil(nn.Module):
+    """Zernike pupil evaluated on the spectral window only; zero elsewhere."""
+
     def __init__(
         self,
-        object_grid_size: int,
+        window: SpectralWindow,
         phase_radial_order: int = 2,
         amplitude_radial_order: int = 0,
         *,
@@ -46,14 +51,15 @@ class Pupil(nn.Module):
         raw_amplitude_coeffs: Tensor | None = None,
         pupil_cutoff_cyc_per_px: Tensor | float = 0.2,
         patch_batch_size: int | None = None,
-        edge_width_px: float = 0.5,
+        edge_width_px: float = DEFAULT_EDGE_WIDTH_PX,
         pupil_cutoff_bounds: tuple[float, float] | None = None,
     ) -> None:
         super().__init__()
         patch_batch_size = patch_batch_size or 1
         num_phase_terms = zernike_num_terms(phase_radial_order)
         num_amplitude_terms = zernike_num_terms(amplitude_radial_order)
-        self.object_grid_size = object_grid_size
+        self.window = window
+        self.object_grid_size = window.object_grid_size
         self.phase_radial_order = phase_radial_order
         self.amplitude_radial_order = amplitude_radial_order
         self.num_phase_terms = num_phase_terms
@@ -62,7 +68,7 @@ class Pupil(nn.Module):
         self.edge_width_px = edge_width_px
 
         rho_pixels, angular_parts, radial_coeffs, radial_powers = zernike_basis_tensors(
-            object_grid_size,
+            window.coords(),
             max(phase_radial_order, amplitude_radial_order),
         )
         self.register_buffer("rho_pixels", rho_pixels)
@@ -129,7 +135,7 @@ class Pupil(nn.Module):
             self.max_pupil_cutoff_cyc_per_px,
         )
 
-    def forward(self) -> Complex[Tensor, "patch_batch object_height object_width"]:
+    def forward(self) -> Complex[Tensor, "patch_batch window window"]:
         pupil_cutoff_cyc_per_px = self.pupil_cutoff_cyc_per_px
         rho_pixels = cast(Tensor, self.rho_pixels)
         angular_parts = cast(Tensor, self.angular_parts)

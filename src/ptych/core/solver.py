@@ -312,9 +312,20 @@ def _train_batch(
         f"losses_finite={metrics['summary']['losses_finite']}"
     )
     with torch.no_grad():
+        # Embed the windowed pupil in the full object spectrum grid, where it is
+        # zero outside the window by construction.
+        window = model.window
+        pupil_window = model.pupil().detach().cpu()
+        index = window.object_index()
+        pupils = pupil_window.new_zeros(
+            patch_batch_size,
+            window.object_grid_size,
+            window.object_grid_size,
+        )
+        pupils[:, index[:, None], index[None, :]] = pupil_window
         return (
             model.object().detach().cpu(),
-            model.pupil().detach().cpu(),
+            pupils,
             metrics,
         )
 

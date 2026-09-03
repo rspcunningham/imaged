@@ -2,7 +2,7 @@ import torch
 import torch.nn.functional as F
 from jaxtyping import Complex, Float
 
-from ptych.core.forward import FPMForwardModel
+from ptych.core.forward import fft2, ifft2
 
 
 def synthesize_captures(
@@ -13,11 +13,13 @@ def synthesize_captures(
     object_to_capture_ratio: int,
 ) -> Float[torch.Tensor, "illumination height width"]:
     """
-    Generate synthetic captures by running forward model and downsampling.
+    Generate synthetic captures with the full-resolution reference model: tilt the
+    object by each illumination, transform, apply the pupil, transform back, and
+    average |field|^2 over each capture pixel.
 
     Args:
         object_tensor: Complex object tensor [object_height, object_width]
-        pupil_tensor: Complex pupil tensor [object_height, object_width]
+        pupil_tensor: Complex pupil tensor [object_height, object_width], fft order
         illumination_kx: Normalized k-vectors in x direction [illumination]
         illumination_ky: Normalized k-vectors in y direction [illumination]
         object_to_capture_ratio: Linear ratio between object and capture grids
@@ -25,27 +27,31 @@ def synthesize_captures(
     Returns:
         Synthetic captures [illumination, height, width] as float intensities
     """
-    illumination_kx = illumination_kx / object_to_capture_ratio
-    illumination_ky = illumination_ky / object_to_capture_ratio
-
-    # Run forward model at full resolution with one synthetic patch batch element.
-    forward_model = FPMForwardModel(object_tensor.shape[-1]).to(object_tensor.device)
-    complex_image_fields = forward_model(
-        object_tensor[None],
-        pupil_tensor[None],
-        illumination_kx,
-        illumination_ky,
-    )  # [1, illumination, object_height, object_width]
-    predicted_intensities = complex_image_fields.squeeze(0).abs().square()
-
-    # Reduce full-resolution intensities to the capture grid with average pooling
-    if object_to_capture_ratio > 1:
-        # Add channel dimension for avg_pool2d.
-        predicted_intensities = predicted_intensities.unsqueeze(1)
-        predicted_intensities = F.avg_pool2d(
-            predicted_intensities,
-            kernel_size=object_to_capture_ratio,
+    object_grid_size = object_tensor.shape[-1]
+    coords = torch.arange(
+        object_grid_size,
+        dtype=torch.get_default_dtype(),
+        device=object_tensor.device,
+    )
+    shift_x = (illumination_kx / object_to_capture_ratio * object_grid_size).to(coords)
+    shift_y = (illumination_ky / object_to_capture_ratio * object_grid_size).to(coords)
+    phase = (
+        2
+        * torch.pi
+        * (
+            shift_x[:, None, None] * coords[None, None, :]
+            + shift_y[:, None, None] * coords[None, :, None]
         )
-        predicted_intensities = predicted_intensities.squeeze(1)
+        / object_grid_size
+    )
+    tilted_objects = object_tensor[None] * torch.exp(1j * phase.to(object_tensor.dtype))
+    fields = ifft2(pupil_tensor[None] * fft2(tilted_objects))
+    intensities = fields.abs().square()
 
-    return predicted_intensities
+    if object_to_capture_ratio > 1:
+        intensities = F.avg_pool2d(
+            intensities[:, None],
+            kernel_size=object_to_capture_ratio,
+        )[:, 0]
+
+    return intensities

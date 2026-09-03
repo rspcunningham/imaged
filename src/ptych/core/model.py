@@ -1,15 +1,12 @@
-from typing import cast
-
 import torch
 import torch.nn as nn
 from jaxtyping import Float
 from torch import Tensor
 
 from ptych.core.darkfield import DarkfieldBackgrounds, DarkfieldScatter
-from ptych.core.forward import FPMForwardModel
-from ptych.core.intensity_downsample import intensity_downsample
+from ptych.core.forward import FPMForwardModel, SpectralWindow
 from ptych.core.object import Object
-from ptych.core.pupil import Pupil
+from ptych.core.pupil import DEFAULT_EDGE_WIDTH_PX, Pupil
 
 
 class IlluminationGains(nn.Module):
@@ -55,11 +52,18 @@ class PtychographyModel(nn.Module):
         min_pupil_cutoff, max_pupil_cutoff = _pupil_cutoff_limits(
             pupil_cutoff_cyc_per_px_init
         )
+        window = SpectralWindow.from_pupil(
+            object_grid_size=object_grid_size,
+            capture_grid_size=capture_height,
+            max_cutoff_cyc_per_px=max_pupil_cutoff,
+            edge_width_px=DEFAULT_EDGE_WIDTH_PX,
+        )
 
         self.object_to_capture_ratio = object_to_capture_ratio
+        self.window = window
         self.object = Object(measured_intensity_batch, object_to_capture_ratio)
         self.pupil = Pupil(
-            object_grid_size,
+            window,
             phase_radial_order=pupil_phase_radial_order,
             amplitude_radial_order=pupil_amplitude_radial_order,
             pupil_cutoff_cyc_per_px=pupil_cutoff_cyc_per_px_init,
@@ -81,15 +85,11 @@ class PtychographyModel(nn.Module):
             object_to_capture_ratio=object_to_capture_ratio,
             pupil_cutoff_cyc_per_px=pupil_cutoff_cyc_per_px_init,
         )
-        illumination_kx = illumination_kx / object_to_capture_ratio
-        illumination_ky = illumination_ky / object_to_capture_ratio
         self.forward_model = FPMForwardModel(
-            object_grid_size,
-            illumination_kx,
-            illumination_ky,
+            window,
+            illumination_kx / object_to_capture_ratio,
+            illumination_ky / object_to_capture_ratio,
         )
-        self.register_buffer("illumination_kx", illumination_kx)
-        self.register_buffer("illumination_ky", illumination_ky)
 
     def forward(
         self,
@@ -98,19 +98,12 @@ class PtychographyModel(nn.Module):
         if illumination_slice is None:
             illumination_slice = slice(None)
 
-        object_tensor = self.object()
-        phase_ramps = cast(Tensor, self.forward_model.cached_phase_ramps)[
-            illumination_slice
-        ]
-        complex_image_fields = self.forward_model.forward_with_phase_ramps(
-            object_tensor,
-            self.pupil(),
-            phase_ramps,
+        spectra = self.forward_model.windowed_spectra(
+            self.object(),
+            illumination_slice,
         )
-        predicted_low_res = intensity_downsample(
-            complex_image_fields,
-            self.object_to_capture_ratio,
-        )
+        filtered_spectra = self.pupil()[:, None] * spectra
+        predicted_low_res = self.forward_model.capture_intensity(filtered_spectra)
         predicted_low_res = (
             predicted_low_res
             * self.illumination_gains()[illumination_slice][None, :, None, None]

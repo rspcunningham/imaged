@@ -49,13 +49,10 @@ def zernike_num_terms(max_radial_order: int) -> int:
 
 
 def zernike_basis_tensors(
-    object_grid_size: int,
+    coords: Tensor,
     max_radial_order: int,
 ) -> tuple[Tensor, Tensor, Tensor, Tensor]:
-    coords = torch.arange(object_grid_size, dtype=torch.get_default_dtype())
-    coords = torch.where(
-        coords >= object_grid_size / 2, coords - object_grid_size, coords
-    )
+    """Zernike basis on the square grid spanned by signed spectral coordinates."""
     grid_y, grid_x = torch.meshgrid(coords, coords, indexing="ij")
     rho_pixels = torch.sqrt(grid_x**2 + grid_y**2)
     theta = torch.atan2(grid_y, grid_x)
