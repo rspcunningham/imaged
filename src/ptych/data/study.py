@@ -16,7 +16,10 @@ class PtychStudy:
     capture_metadata: list[Capture]
     captures: Float[
         torch.Tensor, "illumination height width"
-    ]  # Demosaiced, dark-subtracted, exposure-corrected scalar intensities normalized to max 1.
+    ]  # Demosaiced, dark-subtracted (signed), exposure-corrected intensities normalized to max 1.
+    noise_sigma: Float[
+        torch.Tensor, "illumination"
+    ]  # Per-capture temporal noise sigma from the dark captures, same units as captures.
     illumination_kx: Float[
         torch.Tensor, "illumination"
     ]  # Normalized to camera grid (cycles per sample pixel).
@@ -31,12 +34,14 @@ class PtychStudy:
         captures: Float[torch.Tensor, "illumination height width"],
         illumination_kx: Float[torch.Tensor, "illumination"],
         illumination_ky: Float[torch.Tensor, "illumination"],
+        noise_sigma: Float[torch.Tensor, "illumination"],
     ):
         self.manifest = manifest
         self.capture_metadata = capture_metadata
         self.captures = captures
         self.illumination_kx = illumination_kx
         self.illumination_ky = illumination_ky
+        self.noise_sigma = noise_sigma
 
     @classmethod
     def load(
@@ -104,6 +109,7 @@ class PtychStudy:
             captures_tensor,
             illumination_kx,
             illumination_ky,
+            noise_sigma,
         ) = preprocess_study_data(
             manifest,
             raw_images,
@@ -117,4 +123,5 @@ class PtychStudy:
             captures=captures_tensor,
             illumination_kx=illumination_kx,
             illumination_ky=illumination_ky,
+            noise_sigma=noise_sigma,
         )

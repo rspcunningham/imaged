@@ -8,6 +8,10 @@ from torch import Tensor
 
 _DARKFIELD_SCATTER_RANK = 2
 _DARKFIELD_BACKGROUND_QUANTILE = 0.01
+# Floor on the initial background as a fraction of the capture mean. With
+# signed dark subtraction the low quantile of a darkfield capture is at or below
+# zero, and a softplus parameter initialised there has no usable gradient.
+_DARKFIELD_BACKGROUND_MEAN_FLOOR = 0.3
 
 
 def _inverse_softplus(value: Tensor) -> Tensor:
@@ -50,7 +54,10 @@ class DarkfieldBackgrounds(nn.Module):
             .cpu()
         )
         kth_index = max(1, int(_DARKFIELD_BACKGROUND_QUANTILE * flat.shape[1]))
-        background = flat.kthvalue(kth_index, dim=1).values.clamp_min(1e-8)
+        background = torch.maximum(
+            flat.kthvalue(kth_index, dim=1).values,
+            _DARKFIELD_BACKGROUND_MEAN_FLOOR * flat.mean(dim=1),
+        ).clamp_min(1e-8)
         darkfield_mask = _darkfield_mask(
             illumination_kx,
             illumination_ky,

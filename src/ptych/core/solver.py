@@ -21,7 +21,7 @@ class SolverLearningRates:
     object: float = 5e-3
     pupil: float = 1e-3
     illumination_gains: float = 1e-2
-    darkfield_backgrounds: float = 1e-2
+    darkfield_backgrounds: float = 1e-1
     darkfield_scatter: float = 3e-2
 
 
@@ -61,6 +61,10 @@ class _SolvedBatch:
 
 
 DEFAULT_ILLUMINATION_CHUNK_SIZE = 16
+# Pedestal added inside both square roots of the amplitude residual, in units of
+# each capture's noise sigma. Keeps signed (unclamped) measurements valid and
+# makes the residual intensity-like for pixels near the noise floor.
+NOISE_PEDESTAL_SIGMAS = 10.0
 
 type _OptimizerParameterGroup = tuple[str, list[Tensor], float]
 
@@ -143,6 +147,7 @@ def _train_batch(
     measured_intensity_batch: Float[Tensor, "patch_batch illumination height width"],
     illumination_kx: Float[Tensor, "illumination"],
     illumination_ky: Float[Tensor, "illumination"],
+    noise_sigma: Float[Tensor, "illumination"],
     *,
     object_to_capture_ratio: int,
     pupil_cutoff_cyc_per_px: Tensor | float,
@@ -160,6 +165,9 @@ def _train_batch(
     requested_device = "auto" if device is None else str(device)
     resolved_device = get_default_device() if device is None else torch.device(device)
     measured_intensity_batch = measured_intensity_batch.to(resolved_device)
+    pedestal = (NOISE_PEDESTAL_SIGMAS * noise_sigma.to(resolved_device))[
+        None, :, None, None
+    ]
     model = PtychographyModel(
         measured_intensity_batch,
         illumination_kx.to(resolved_device),
@@ -257,9 +265,10 @@ def _train_batch(
             illumination_slice = slice(illumination_start, illumination_end)
             predicted_intensities = model(illumination_slice)
             measured_intensity_chunk = measured_intensity_batch[:, illumination_slice]
-            intensity_residual = torch.sqrt(predicted_intensities) - torch.sqrt(
-                measured_intensity_chunk
-            )
+            pedestal_chunk = pedestal[:, illumination_slice]
+            intensity_residual = torch.sqrt(
+                predicted_intensities + pedestal_chunk
+            ) - torch.sqrt((measured_intensity_chunk + pedestal_chunk).clamp_min(0))
             squared_intensity_residual = intensity_residual.square()
             patch_loss_numerator = squared_intensity_residual.sum(dim=(1, 2, 3))
             loss_chunk = (patch_loss_numerator / patch_loss_denominator).sum()
@@ -363,6 +372,7 @@ def solve_study(
             measured_intensity_batch,
             study.illumination_kx,
             study.illumination_ky,
+            study.noise_sigma,
             object_to_capture_ratio=object_to_capture_ratio,
             pupil_cutoff_cyc_per_px=pupil_cutoff_cyc_per_px,
             pupil_phase_radial_order=pupil_phase_radial_order,

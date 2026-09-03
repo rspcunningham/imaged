@@ -82,7 +82,15 @@ def preprocess_study_data(
     Float[torch.Tensor, "illumination height width"],
     Float[torch.Tensor, "illumination"],
     Float[torch.Tensor, "illumination"],
+    Float[torch.Tensor, "illumination"],
 ]:
+    """Demosaic, dark-subtract, exposure-correct and normalise the captures.
+
+    Dark subtraction is signed: pixels below the dark level stay negative so the
+    noise stays zero-mean. The per-capture noise sigma (temporal noise of the
+    dark captures for that capture's channel/exposure, in the same normalised
+    units as the returned intensities) is returned alongside.
+    """
     valid_captures, _, illumination_kx, illumination_ky = prepare_captures(manifest)
     y_offset, x_offset = crop_offset
     bayer_pattern = _shift_bayer_pattern(
@@ -115,8 +123,13 @@ def preprocess_study_data(
             key: selected_images[[index for _, index in frames]].mean(dim=0)
             for key, frames in dark_frames.items()
         }
+    dark_sigmas = {
+        key: torch.stack([selected_images[index].std() for _, index in frames]).mean()
+        for key, frames in dark_frames.items()
+    }
 
     corrected_images = []
+    sigmas = []
     for index, capture in enumerate(manifest.captures):
         if not is_illuminated_capture(capture):
             continue
@@ -135,7 +148,10 @@ def preprocess_study_data(
                     ),
                 )
                 dark = selected_images[nearest_index]
-            image = (image - dark).clamp(min=0)
+            image = image - dark
+            sigmas.append(dark_sigmas[key])
+        else:
+            sigmas.append(image.new_zeros(()))
         corrected_images.append(image)
 
     captures_tensor = torch.stack(corrected_images)
@@ -145,6 +161,7 @@ def preprocess_study_data(
         device=captures_tensor.device,
     )
     captures_tensor = captures_tensor / exposure_s[:, None, None]
+    noise_sigma = torch.stack(sigmas).to(captures_tensor) / exposure_s
 
     max_value = torch.max(captures_tensor)
     if max_value <= 0:
@@ -157,4 +174,5 @@ def preprocess_study_data(
         captures_tensor / max_value,
         illumination_kx,
         illumination_ky,
+        noise_sigma / max_value,
     )
