@@ -3,8 +3,8 @@ import torch.nn as nn
 from jaxtyping import Float
 from torch import Tensor
 
-from ptych.core.darkfield import DarkfieldBackgrounds, DarkfieldScatter
 from ptych.core.forward import FPMForwardModel, SpectralWindow
+from ptych.core.nuisance import Backgrounds, Scatter
 from ptych.core.object import Object
 from ptych.core.pupil import DEFAULT_EDGE_WIDTH_PX, Pupil
 
@@ -71,14 +71,8 @@ class PtychographyModel(nn.Module):
             pupil_cutoff_bounds=(min_pupil_cutoff, max_pupil_cutoff),
         )
         self.illumination_gains = IlluminationGains(num_illuminations)
-        self.darkfield_backgrounds = DarkfieldBackgrounds(
-            measured_intensity_batch,
-            illumination_kx,
-            illumination_ky,
-            object_to_capture_ratio=object_to_capture_ratio,
-            pupil_cutoff_cyc_per_px=pupil_cutoff_cyc_per_px_init,
-        )
-        self.darkfield_scatter = DarkfieldScatter(
+        self.backgrounds = Backgrounds(measured_intensity_batch)
+        self.scatter = Scatter(
             measured_intensity_batch,
             illumination_kx,
             illumination_ky,
@@ -110,8 +104,8 @@ class PtychographyModel(nn.Module):
         )
         return (
             predicted_low_res
-            + self.darkfield_backgrounds.incoherent_intensity()[illumination_slice][
+            + self.backgrounds.incoherent_intensity()[illumination_slice][
                 None, :, None, None
             ]
-            + self.darkfield_scatter.incoherent_intensity(illumination_slice)
+            + self.scatter.incoherent_intensity(illumination_slice)
         )

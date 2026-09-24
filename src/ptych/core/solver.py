@@ -21,8 +21,8 @@ class SolverLearningRates:
     object: float = 5e-3
     pupil: float = 1e-3
     illumination_gains: float = 1e-2
-    darkfield_backgrounds: float = 1e-1
-    darkfield_scatter: float = 3e-2
+    backgrounds: float = 1e-1
+    scatter: float = 3e-2
 
 
 @dataclass
@@ -191,14 +191,14 @@ def _train_batch(
             learning_rates.illumination_gains,
         ),
         (
-            "darkfield_backgrounds",
-            list(model.darkfield_backgrounds.parameters()),
-            learning_rates.darkfield_backgrounds,
+            "backgrounds",
+            list(model.backgrounds.parameters()),
+            learning_rates.backgrounds,
         ),
         (
-            "darkfield_scatter",
-            list(model.darkfield_scatter.parameters()),
-            learning_rates.darkfield_scatter,
+            "scatter",
+            list(model.scatter.parameters()),
+            learning_rates.scatter,
         ),
     ]
     optimizer_groups = [

@@ -36,8 +36,8 @@ LEARNING_RATES = SolverLearningRates(
     object=1e-1,
     pupil=1e-2,
     illumination_gains=1e-1,
-    darkfield_backgrounds=1e-1,
-    darkfield_scatter=3e-2,
+    backgrounds=1e-1,
+    scatter=3e-2,
 )
 
 # Output directory
