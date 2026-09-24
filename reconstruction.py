@@ -31,7 +31,7 @@ PATCH_BATCH_SIZE = 1
 ILLUMINATION_CHUNK_SIZE = 145
 
 # Runtime settings
-EPOCHS = 60
+EPOCHS = 200
 LEARNING_RATES = SolverLearningRates(
     object=1e-1,
     pupil=1e-2,
