@@ -5,15 +5,15 @@ from datetime import datetime
 import torch
 from jaxtyping import Float
 
-from ptych.data.bayer import demosaic
-from ptych.data.types import (
+from imaged.data.bayer import demosaic
+from imaged.data.types import (
     Channel,
     Capture,
     DarkSubtraction,
     StudyManifest,
     is_illuminated_capture,
 )
-from ptych.data.utils import prepare_captures
+from imaged.data.utils import prepare_captures
 
 _CHANNEL_INDICES: dict[Channel, int] = {"R": 0, "G": 1, "B": 2}
 

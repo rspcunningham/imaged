@@ -2,7 +2,7 @@ import torch
 import torch.nn.functional as F
 from jaxtyping import Complex, Float
 
-from ptych.core.forward import fft2, ifft2
+from imaged.core.forward import fft2, ifft2
 
 
 def synthesize_captures(

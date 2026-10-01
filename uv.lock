@@ -433,7 +433,7 @@ wheels = [
 ]
 
 [[package]]
-name = "ptych"
+name = "imaged"
 version = "0.0.1"
 source = { editable = "." }
 dependencies = [

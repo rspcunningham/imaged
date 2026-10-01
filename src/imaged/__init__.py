@@ -1,10 +1,10 @@
-from ptych.core.solver import (
+from imaged.core.solver import (
     SolverLearningRates,
     StudySolveResult,
     solve_study,
 )
-from ptych.data.preprocess import ImageCrop, centered_square_crop
-from ptych.data.study import PtychStudy
+from imaged.data.preprocess import ImageCrop, centered_square_crop
+from imaged.data.study import PtychStudy
 
 __all__ = [
     "ImageCrop",

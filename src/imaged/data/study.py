@@ -6,9 +6,9 @@ import numpy.typing as npt
 import torch
 from jaxtyping import Float
 
-from ptych.data.preprocess import ImageCrop, preprocess_study_data
-from ptych.data.types import Capture, DarkSubtraction, StudyManifest
-from ptych.data.validate import DatasetValidationError, validate_dataset
+from imaged.data.preprocess import ImageCrop, preprocess_study_data
+from imaged.data.types import Capture, DarkSubtraction, StudyManifest
+from imaged.data.validate import DatasetValidationError, validate_dataset
 
 
 class PtychStudy:
@@ -50,7 +50,7 @@ class PtychStudy:
         if candidate_path.exists():
             dir_path = candidate_path
         else:
-            from ptych.data.download.dataset_cache import NextcloudDatasetCache
+            from imaged.data.download.dataset_cache import NextcloudDatasetCache
 
             cache = NextcloudDatasetCache()
             dir_path = cache.fetch_dataset(str(dataset))

@@ -4,9 +4,9 @@ from pathlib import Path
 
 import numpy as np
 
-from ptych import ImageCrop, PtychStudy, SolverLearningRates, solve_study
-from ptych.core.metric_plots import save_metrics_summary
-from ptych.data.utils import get_default_device
+from imaged import ImageCrop, PtychStudy, SolverLearningRates, solve_study
+from imaged.core.metric_plots import save_metrics_summary
+from imaged.data.utils import get_default_device
 
 # Select dataset
 dataset = "datasets/20260728-122052-Bar Pattern"

@@ -13,12 +13,12 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import BinaryIO, Protocol, cast
 
-from ptych.data.validate import DatasetValidationError, validate_dataset
+from imaged.data.validate import DatasetValidationError, validate_dataset
 
 from .nextcloud_share import NextcloudShareTransport
 
 
-DEFAULT_CACHE_DIR = Path.home() / ".cache" / "ptych" / "datasets"
+DEFAULT_CACHE_DIR = Path.home() / ".cache" / "imaged" / "datasets"
 DEFAULT_DOWNLOAD_MAX_ATTEMPTS = 3
 DEFAULT_DOWNLOAD_RETRY_DELAY_SECONDS = 5
 
@@ -254,24 +254,24 @@ class NextcloudDatasetCache:
     def _resolve_base_url(self, base_url: str | None) -> str:
         resolved = (
             base_url
-            or os.environ.get("PTYCH_NEXTCLOUD_BASE_URL")
+            or os.environ.get("IMAGED_NEXTCLOUD_BASE_URL")
             or DEFAULT_NEXTCLOUD_BASE_URL
         ).strip()
         if not resolved:
             raise NextcloudDatasetCacheError(
-                "Nextcloud base URL is not configured. Set PTYCH_NEXTCLOUD_BASE_URL or edit DEFAULT_NEXTCLOUD_BASE_URL in dataset_cache.py."
+                "Nextcloud base URL is not configured. Set IMAGED_NEXTCLOUD_BASE_URL or edit DEFAULT_NEXTCLOUD_BASE_URL in dataset_cache.py."
             )
         return resolved.rstrip("/")
 
     def _resolve_share_id(self, share_id: str | None) -> str:
         resolved = (
             share_id
-            or os.environ.get("PTYCH_NEXTCLOUD_SHARE_ID")
+            or os.environ.get("IMAGED_NEXTCLOUD_SHARE_ID")
             or DEFAULT_NEXTCLOUD_SHARE_ID
         ).strip()
         if not resolved:
             raise NextcloudDatasetCacheError(
-                "Nextcloud share ID is not configured. Set PTYCH_NEXTCLOUD_SHARE_ID or edit DEFAULT_NEXTCLOUD_SHARE_ID in dataset_cache.py."
+                "Nextcloud share ID is not configured. Set IMAGED_NEXTCLOUD_SHARE_ID or edit DEFAULT_NEXTCLOUD_SHARE_ID in dataset_cache.py."
             )
         return resolved
 

@@ -9,8 +9,8 @@ from typing import cast
 import numpy as np
 import numpy.typing as npt
 
-from ptych.data.parse import ManifestParseError, parse_manifest
-from ptych.data.types import StudyManifest, is_illuminated_capture
+from imaged.data.parse import ManifestParseError, parse_manifest
+from imaged.data.types import StudyManifest, is_illuminated_capture
 
 
 class DatasetValidationError(Exception):

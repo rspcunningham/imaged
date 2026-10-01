@@ -4,10 +4,10 @@ import numpy as np
 import torch
 from jaxtyping import Complex, Float
 
-from ptych.core.synthetic import synthesize_captures
-from ptych.data.parse import write_manifest
-from ptych.data.types import StudyManifest
-from ptych.data.utils import prepare_captures
+from imaged.core.synthetic import synthesize_captures
+from imaged.data.parse import write_manifest
+from imaged.data.types import StudyManifest
+from imaged.data.utils import prepare_captures
 
 
 def generate_synthetic_study(

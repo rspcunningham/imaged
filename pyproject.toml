@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "ptych"
+name = "imaged"
 version = "0.0.1"
 description = ""
 readme = "README.md"
@@ -22,10 +22,10 @@ dependencies = [
 ]
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/ptych"]
+packages = ["src/imaged"]
 
 [project.scripts]
-ptych-dataset = "ptych.data.upload.cli:main"
+imaged-dataset = "imaged.data.upload.cli:main"
 
 
 [dependency-groups]
@@ -35,4 +35,4 @@ dev = [
 ]
 
 [tool.ruff.lint.per-file-ignores]
-"src/ptych/**/*.py" = ["F722", "F821"]
+"src/imaged/**/*.py" = ["F722", "F821"]

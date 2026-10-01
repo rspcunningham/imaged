@@ -6,12 +6,12 @@ import sys
 from pathlib import Path
 from typing import cast
 
-from ptych.data.validate import (
+from imaged.data.validate import (
     DatasetValidationError,
     normalize_dataset_id,
     validate_dataset,
 )
-from ptych.data.upload.nextcloud_webdav import (
+from imaged.data.upload.nextcloud_webdav import (
     AUTH_CONFIG_PATH,
     NEXTCLOUD_REMOTE_ROOT,
     NextcloudAuthError,
@@ -42,8 +42,8 @@ def main() -> None:
 
 def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        prog="ptych-dataset",
-        description="Validate and publish ptych datasets to the project Nextcloud bucket",
+        prog="imaged-dataset",
+        description="Validate and publish imaged datasets to the project Nextcloud bucket",
     )
     subparsers = parser.add_subparsers(required=True)
 

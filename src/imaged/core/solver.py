@@ -9,11 +9,11 @@ from jaxtyping import Complex, Float
 from torch import Tensor
 from tqdm import tqdm
 
-from ptych.core.metrics import BatchMetricsRecord, InverseMetrics
-from ptych.core.model import PtychographyModel
-from ptych.core.pupil import pupil_cutoff_cyc_per_px_from_optics
-from ptych.data.study import PtychStudy
-from ptych.data.utils import get_default_device
+from imaged.core.metrics import BatchMetricsRecord, InverseMetrics
+from imaged.core.model import PtychographyModel
+from imaged.core.pupil import pupil_cutoff_cyc_per_px_from_optics
+from imaged.data.study import PtychStudy
+from imaged.data.utils import get_default_device
 
 
 @dataclass(frozen=True)

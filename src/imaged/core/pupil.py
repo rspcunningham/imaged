@@ -6,8 +6,8 @@ import torch.nn.functional as F
 from jaxtyping import Complex
 from torch import Tensor
 
-from ptych.core.forward import SpectralWindow
-from ptych.core.zernike import zernike_basis_tensors, zernike_num_terms
+from imaged.core.forward import SpectralWindow
+from imaged.core.zernike import zernike_basis_tensors, zernike_num_terms
 
 DEFAULT_EDGE_WIDTH_PX = 0.5
 

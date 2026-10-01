@@ -7,7 +7,7 @@ from matplotlib import pyplot as plt
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 
-from ptych.core.metrics import BatchMetricsRecord
+from imaged.core.metrics import BatchMetricsRecord
 
 type FloatArray = npt.NDArray[np.float32]
 

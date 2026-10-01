@@ -3,7 +3,12 @@ import math
 import torch
 from jaxtyping import Float
 
-from ptych.data.types import Capture, LedPosition, StudyManifest, is_illuminated_capture
+from imaged.data.types import (
+    Capture,
+    LedPosition,
+    StudyManifest,
+    is_illuminated_capture,
+)
 
 
 def get_default_device() -> torch.device:

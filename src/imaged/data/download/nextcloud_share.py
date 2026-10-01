@@ -16,7 +16,7 @@ from typing import BinaryIO, Callable, Protocol, cast
 
 from tqdm.auto import tqdm
 
-from ptych.data.validate import (
+from imaged.data.validate import (
     DatasetValidationError,
     load_manifest,
     validate_dataset,
@@ -107,7 +107,7 @@ def _format_bytes(num_bytes: int) -> str:
 
 
 def _download_workers() -> int:
-    raw_value = os.environ.get("PTYCH_DOWNLOAD_WORKERS")
+    raw_value = os.environ.get("IMAGED_DOWNLOAD_WORKERS")
     if raw_value is None:
         return DEFAULT_DOWNLOAD_WORKERS
 

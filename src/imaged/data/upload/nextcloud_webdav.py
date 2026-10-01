@@ -14,13 +14,13 @@ from typing import BinaryIO, Protocol, cast
 
 from tqdm.auto import tqdm
 
-from ptych.data.validate import ValidatedDataset, parse_manifest_data
+from imaged.data.validate import ValidatedDataset, parse_manifest_data
 
 
 NEXTCLOUD_BASE_URL = "https://dqe.asuscomm.com"
 NEXTCLOUD_PUBLIC_SHARE_ID = "SLbNBTqK9firqZM"
 NEXTCLOUD_REMOTE_ROOT = "public_fpm_data"
-AUTH_CONFIG_PATH = Path.home() / ".config" / "ptych" / "nextcloud-auth.json"
+AUTH_CONFIG_PATH = Path.home() / ".config" / "imaged" / "nextcloud-auth.json"
 UPLOAD_CHUNK_SIZE = 1024 * 1024
 PROGRESS_BAR_FORMAT = (
     "{desc}: {percentage:3.0f}%|{bar}| {n_fmt}/{total_fmt} "
@@ -89,7 +89,7 @@ class _ProgressReader:
 def read_credentials(path: Path = AUTH_CONFIG_PATH) -> NextcloudCredentials:
     if not path.is_file():
         raise NextcloudAuthError(
-            "Nextcloud credentials are not configured. Run `ptych-dataset auth` first."
+            "Nextcloud credentials are not configured. Run `imaged-dataset auth` first."
         )
 
     try:

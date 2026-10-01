@@ -3,10 +3,10 @@ import torch.nn as nn
 from jaxtyping import Float
 from torch import Tensor
 
-from ptych.core.forward import FPMForwardModel, SpectralWindow
-from ptych.core.nuisance import Backgrounds
-from ptych.core.object import Object
-from ptych.core.pupil import DEFAULT_EDGE_WIDTH_PX, Pupil
+from imaged.core.forward import FPMForwardModel, SpectralWindow
+from imaged.core.nuisance import Backgrounds
+from imaged.core.object import Object
+from imaged.core.pupil import DEFAULT_EDGE_WIDTH_PX, Pupil
 
 
 class IlluminationGains(nn.Module):

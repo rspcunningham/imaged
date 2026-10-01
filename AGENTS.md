@@ -2,7 +2,7 @@
 
 ## Project Structure & Module Organization
 
-This repository packages `ptych`, a Python library for Fourier ptychographic reconstruction. Core reconstruction code lives in `src/ptych/core/`. Data handling / loading is in `src/ptych/data`. Data is provided from a custom repository hosted on the lab team's NextCloud.
+This repository packages `imaged`, a Python library for Fourier ptychographic reconstruction. Core reconstruction code lives in `src/imaged/core/`. Data handling / loading is in `src/imaged/data`. Data is provided from a custom repository hosted on the lab team's NextCloud.
 
 Top-level demo scripts are `synthetic_demo.py` and `reconstruction_demo.py`. Documentation and
 assets live in `README.md`, `INFO_JSON_SCHEMA.md`, `docs/`, and `demo_images/`.
