@@ -65,6 +65,7 @@ with its own `(channel, exposure)` pair. How multiple darks for one pair are
 combined is selected at load time: `average_all` subtracts their mean, and
 `nearest_only` subtracts the single dark whose `captured_at` is closest to the
 illuminated capture's `captured_at`, choosing the earlier one on a tie.
+`none` skips dark subtraction and leaves the sensor offset in the data.
 
 ## LED position
 

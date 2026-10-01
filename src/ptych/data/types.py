@@ -10,7 +10,7 @@ type BayerFormat = Literal["RGGB", "GRBG", "GBRG", "BGGR"]
 BAYER_FORMATS: tuple[BayerFormat, ...] = ("RGGB", "GRBG", "GBRG", "BGGR")
 type Channel = Literal["R", "G", "B"]
 CHANNELS: tuple[Channel, ...] = ("R", "G", "B")
-type DarkSubtraction = Literal["average_all", "nearest_only"]
+type DarkSubtraction = Literal["average_all", "nearest_only", "none"]
 
 
 @dataclass

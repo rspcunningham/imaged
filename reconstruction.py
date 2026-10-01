@@ -14,7 +14,7 @@ dataset = "datasets/20260728-122052-Bar Pattern"
 CROP_SIZE = 616  # 616px window in the 1232x1232 frame
 CROP_TOP = 0
 CROP_LEFT = 128  # 512px shift in the 4x output
-DARK_SUBTRACTION = "average_all"  # "average_all" or "nearest_only"
+DARK_SUBTRACTION = "average_all"  # "average_all", "nearest_only" or "none"
 # Debug: persist every preprocessed capture, not just the first.
 SAVE_ALL_CAPTURES = True
 
@@ -37,8 +37,9 @@ LEARNING_RATES = SolverLearningRates(
     pupil=1e-2,
     illumination_gains=1e-1,
     backgrounds=1e-1,
-    scatter=3e-2,
 )
+# Floor inside the amplitude loss, as a fraction of the brightest pixel.
+LOSS_EPSILON = 1e-2
 
 # Output directory
 timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
@@ -78,6 +79,7 @@ result = solve_study(
     patch_batch_size=PATCH_BATCH_SIZE,
     illumination_chunk_size=ILLUMINATION_CHUNK_SIZE,
     learning_rates=LEARNING_RATES,
+    loss_epsilon=LOSS_EPSILON,
 )
 
 # Save reconstruction artifacts.
