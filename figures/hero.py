@@ -47,7 +47,11 @@ def render() -> None:
     data, arrays = load_data(NAME)
     fig, axes = plt.subplots(1, 2, figsize=(style.COLUMN_WIDTH_IN, 4.9))
     for ax, (title, key) in zip(
-        axes, [("One capture", "capture"), ("Reconstruction", "reconstruction")]
+        axes,
+        [
+            ("Before: one capture", "capture"),
+            ("After: reconstruction", "reconstruction"),
+        ],
     ):
         image = arrays[key]
         ax.imshow(
