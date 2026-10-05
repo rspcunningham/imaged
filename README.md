@@ -1,6 +1,6 @@
 # imaged
 
-**Imaging As Gradient Descent.** A Python/PyTorch library for Fourier ptychographic microscopy: reconstructing a high-resolution sample from low-resolution captures taken under different illumination angles.
+**Imaging As Gradient Descent (ImAGeD).** A Python/PyTorch library for Fourier ptychographic microscopy: reconstructing a high-resolution sample from low-resolution captures taken under different illumination angles.
 
 It jointly fits the sample, lens aberrations and aperture radius, illumination brightness, and background light through a differentiable microscope model.
 
