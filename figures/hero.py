@@ -1,4 +1,4 @@
-"""Figure 1, option C: one raw capture vs the reconstruction, zoomed on bar groups 7-8."""
+"""Figure 1: one raw capture vs the reconstruction, zoomed on bar groups 7-8."""
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -14,16 +14,16 @@ from figures.common import (
     save_data,
 )
 
-NAME = "hero_c"
-RUN = "bar-full"
+NAME = "hero"
+RUN = "bar-single-patch"
 CAPTURE_INDEX = 0  # centre LED, brightfield
-# Groups 7 and 8 of the target, in capture pixels of the bar crop.
-TOP, BOTTOM, LEFT, RIGHT = 100, 414, 325, 562
+# Groups 7 and 8 of the target, in capture pixels of the single-patch crop.
+TOP, BOTTOM, LEFT, RIGHT = 52, 366, 89, 326
 
 
 def compute() -> None:
-    study = load_study("bar")
-    obj = reconstruct(RUN, "bar")
+    study = load_study("bar_single_patch")
+    obj = reconstruct(RUN, "bar_single_patch")
     r = OBJECT_TO_CAPTURE_RATIO
     save_data(
         NAME,

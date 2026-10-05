@@ -25,6 +25,11 @@ DATASETS = {
         "datasets/20260728-122052-Bar Pattern",
         ImageCrop(top=0, left=128, width=616, height=616),
     ),
+    # Groups 7-8 of the bar target inside one 416 px patch, so nothing is stitched.
+    "bar_single_patch": (
+        "datasets/20260728-122052-Bar Pattern",
+        ImageCrop(top=48, left=364, width=416, height=416),
+    ),
 }
 OBJECT_TO_CAPTURE_RATIO = 4
 # reconstruction.py settings.
