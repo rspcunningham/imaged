@@ -2,7 +2,8 @@
 
 compute runs the image-eval CLI on the centre-LED capture (the base image, which
 mtf_template.json is drawn on) and on the hero reconstruction, and keeps its raw JSON
-reports. render plots straight from those reports.
+reports. render plots straight from those reports. The NPS is from the flat black
+region, each image out to its own sampling Nyquist.
 """
 
 import json
@@ -20,7 +21,7 @@ RUN = "bar-single-patch"
 TEMPLATE = ROOT / "figures" / "mtf_template.json"
 # image-eval lives in a sibling checkout; run it from there so local changes apply.
 IMAGE_EVAL = ["uv", "run", "--project", str(ROOT.parent / "image-eval"), "image-eval"]
-NPS_MAX_CYCLES_PER_MM = 1200  # the capture's sampling Nyquist
+NPS_SCALE = 1e-11  # axis unit; image-eval reports NPS in intensity^2 mm^2
 
 
 def compute() -> None:
@@ -103,15 +104,15 @@ def render() -> None:
         nps = np.array(
             [np.nan if r["black_nps"] is None else r["black_nps"] for r in rows]
         )
-        keep = f <= NPS_MAX_CYCLES_PER_MM
-        nps_ax.semilogy(f[keep], nps[keep], color=color, lw=1.4)
+        nps_ax.plot(f, nps / NPS_SCALE, color=color, lw=1.4, solid_capstyle="round")
 
     mtf_ax.set_xlabel("spatial frequency (cycles/mm)")
     mtf_ax.set_ylabel("MTF")
     mtf_ax.set_ylim(0, 0.8)
     nps_ax.set_xlabel("spatial frequency (cycles/mm)")
-    nps_ax.set_ylabel("NPS, flat black region")
-    nps_ax.set_xlim(0, NPS_MAX_CYCLES_PER_MM)
+    nps_ax.set_ylabel("NPS (10$^{-11}$ intensity$^2$ mm$^2$)")
+    nps_ax.set_xlim(0, None)
+    nps_ax.set_ylim(0, None)
     for ax in (mtf_ax, nps_ax):
         ax.tick_params(labelfontfamily="Geist Mono")
     fig.savefig(figure_path(NAME))
