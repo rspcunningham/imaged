@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import FancyBboxPatch
 
 from figures import style
-from figures.common import OUT
+from figures.common import figure_path
 
 NAME = "architecture"
 ROW, BELOW, ABOVE, TOP = 2.0, 0.1, 3.7, 4.75
@@ -141,9 +141,7 @@ def draw(full: bool) -> None:
         gradient(9.95, ROW)
         gradient(11.45, ROW)
 
-    name = "full" if full else "naive"
-    (OUT / NAME).mkdir(parents=True, exist_ok=True)
-    fig.savefig(OUT / NAME / f"{name}.png")
+    fig.savefig(figure_path("model-full" if full else "model-naive"))
     plt.close(fig)
 
 

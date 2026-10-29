@@ -3,7 +3,9 @@
 Three layers, so restyling never recomputes anything:
   runs     results/figures/runs/<run>/      cached reconstructions (slow)
   data     results/figures/<figure>/        what one figure shows: data.json + arrays.npz
-  render   results/figures/<figure>/<figure>.png, from data + figures/style.py
+  render   figures/output/<figure>.png, from data + figures/style.py
+
+Runs and data are large and gitignored; rendered figures are tracked.
 """
 
 import json
@@ -15,6 +17,7 @@ from imaged import ImageCrop, PtychStudy, SolverLearningRates, solve_study
 
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "results" / "figures"
+RENDERED = ROOT / "figures" / "output"
 
 DATASETS = {
     "malaria": (
@@ -86,4 +89,5 @@ def load_data(figure: str) -> tuple[dict, dict[str, np.ndarray]]:
 
 
 def figure_path(figure: str) -> Path:
-    return OUT / figure / f"{figure}.png"
+    RENDERED.mkdir(exist_ok=True)
+    return RENDERED / f"{figure}.png"

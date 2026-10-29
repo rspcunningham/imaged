@@ -4,6 +4,8 @@ A Python/PyTorch library for Fourier ptychographic microscopy: reconstructing a 
 
 It jointly fits the sample, lens aberrations and aperture radius, illumination brightness, and background light through a differentiable microscope model.
 
+![Block diagram of the forward model: the learned sample spectrum is shifted per LED, filtered by a lens built from learned Zernike coefficients and radius, turned into intensity, scaled by a learned per-LED gain and offset by a learned per-capture background, then compared with the measured capture; gradient descent updates every learned block.](figures/output/model-full.png)
+
 Read the accompanying essay: [High resolution imaging is a learning problem](https://www.rspcunningham.com/imaging-is-learning).
 
 ## Run a reconstruction
