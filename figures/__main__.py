@@ -2,10 +2,11 @@
 
 import argparse
 
-from figures import apertures, architecture, hero, mtf, optics
+from figures import apertures, architecture, hero, mtf, naive, optics
 
 FIGURES = {
-    module.NAME: module for module in (hero, optics, apertures, architecture, mtf)
+    module.NAME: module
+    for module in (hero, optics, apertures, architecture, naive, mtf)
 }
 
 parser = argparse.ArgumentParser(prog="figures")
