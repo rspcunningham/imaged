@@ -2,9 +2,9 @@
 
 import argparse
 
-from figures import hero
+from figures import apertures, architecture, hero, optics
 
-FIGURES = {module.NAME: module for module in (hero,)}
+FIGURES = {module.NAME: module for module in (hero, optics, apertures, architecture)}
 
 parser = argparse.ArgumentParser(prog="figures")
 parser.add_argument("stage", choices=["compute", "render"])

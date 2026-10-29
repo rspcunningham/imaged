@@ -45,12 +45,12 @@ def compute() -> None:
 def render() -> None:
     style.apply()
     data, arrays = load_data(NAME)
-    fig, axes = plt.subplots(1, 2, figsize=(style.COLUMN_WIDTH_IN, 4.9))
+    fig, axes = plt.subplots(1, 2, figsize=(style.COLUMN_WIDTH_IN, 4.2))
     for ax, (title, key) in zip(
         axes,
         [
-            ("Before: one capture", "capture"),
-            ("After: reconstruction", "reconstruction"),
+            ("one capture", "capture"),
+            ("reconstruction", "reconstruction"),
         ],
     ):
         image = arrays[key]
