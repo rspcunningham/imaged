@@ -5,7 +5,6 @@ from datetime import datetime
 from typing import Any, Literal, TypeGuard
 from uuid import UUID
 
-
 type BayerFormat = Literal["RGGB", "GRBG", "GBRG", "BGGR"]
 BAYER_FORMATS: tuple[BayerFormat, ...] = ("RGGB", "GRBG", "GBRG", "BGGR")
 type Channel = Literal["R", "G", "B"]

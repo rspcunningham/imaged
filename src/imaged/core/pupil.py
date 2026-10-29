@@ -1,10 +1,9 @@
 from typing import cast
 
 import torch
-import torch.nn as nn
 import torch.nn.functional as F
 from jaxtyping import Complex
-from torch import Tensor
+from torch import Tensor, nn
 
 from imaged.core.forward import SpectralWindow
 from imaged.core.zernike import zernike_basis_tensors, zernike_num_terms

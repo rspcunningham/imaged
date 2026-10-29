@@ -35,4 +35,9 @@ dev = [
 ]
 
 [tool.ruff.lint.per-file-ignores]
-"src/imaged/**/*.py" = ["F722", "F821"]
+# jaxtyping shape strings like Float[Tensor, "batch"] are not forward references.
+"src/imaged/**/*.py" = ["F722", "F821", "UP037"]
+
+[tool.ruff.lint.flake8-bugbear]
+# Frozen dataclass: safe to share as a default argument.
+extend-immutable-calls = ["imaged.core.solver.SolverLearningRates"]

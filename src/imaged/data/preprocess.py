@@ -7,8 +7,8 @@ from jaxtyping import Float
 
 from imaged.data.bayer import demosaic
 from imaged.data.types import (
-    Channel,
     Capture,
+    Channel,
     DarkSubtraction,
     StudyManifest,
     is_illuminated_capture,

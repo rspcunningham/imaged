@@ -1,8 +1,7 @@
 import torch
-import torch.nn as nn
 import torch.nn.functional as F
 from jaxtyping import Complex, Float
-from torch import Tensor
+from torch import Tensor, nn
 
 
 class Object(nn.Module):

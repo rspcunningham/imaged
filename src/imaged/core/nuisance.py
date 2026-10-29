@@ -1,8 +1,7 @@
 import torch
-import torch.nn as nn
 import torch.nn.functional as F
 from jaxtyping import Float
-from torch import Tensor
+from torch import Tensor, nn
 
 _BACKGROUND_QUANTILE = 0.01
 # Floor on the initial background as a fraction of the capture mean. With

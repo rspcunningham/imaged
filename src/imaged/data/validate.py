@@ -238,12 +238,12 @@ def _validate_capture_array(path: Path, expected_shape: tuple[int, int]) -> None
             raise DatasetValidationError(
                 f"Capture array must contain only finite values: {path.name}"
             )
-        if np.issubdtype(array.dtype, np.signedinteger) or np.issubdtype(
-            array.dtype, np.floating
-        ):
-            if np.any(np.less(array, 0)):
-                raise DatasetValidationError(
-                    f"Capture array must contain only non-negative values: {path.name}"
-                )
+        if (
+            np.issubdtype(array.dtype, np.signedinteger)
+            or np.issubdtype(array.dtype, np.floating)
+        ) and np.any(np.less(array, 0)):
+            raise DatasetValidationError(
+                f"Capture array must contain only non-negative values: {path.name}"
+            )
     finally:
         del array

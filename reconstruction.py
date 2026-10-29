@@ -42,7 +42,7 @@ LEARNING_RATES = SolverLearningRates(
 LOSS_EPSILON = 1e-2
 
 # Output directory
-timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+timestamp = datetime.now().astimezone().strftime("%Y%m%d-%H%M%S")
 OUTPUT_DIR = Path(f"results/{Path(dataset).name}-{timestamp}")
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 

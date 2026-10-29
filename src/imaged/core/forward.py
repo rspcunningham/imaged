@@ -1,14 +1,14 @@
 from __future__ import annotations
 
 import math
+from collections.abc import Callable
 from dataclasses import dataclass
 from functools import partial
-from typing import Callable, cast
+from typing import cast
 
 import torch
-import torch.nn as nn
 from jaxtyping import Complex, Float
-from torch import Tensor
+from torch import Tensor, nn
 
 # Use unitary Fourier transforms
 fft2 = cast(Callable[..., Tensor], partial(torch.fft.fft2, norm="ortho"))

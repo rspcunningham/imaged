@@ -109,7 +109,7 @@ def _require_bayer_format(data: dict[str, object]) -> BayerFormat:
         raise ManifestParseError(
             f"Expected 'bayer_format' to be one of {supported}, got {value!r}"
         )
-    return cast(BayerFormat, value)
+    return value
 
 
 def _require_channel(data: dict[str, object], context: str) -> Channel:
@@ -119,7 +119,7 @@ def _require_channel(data: dict[str, object], context: str) -> Channel:
         raise ManifestParseError(
             f"{context}: Expected 'channel' to be one of {supported}, got {value!r}"
         )
-    return cast(Channel, value)
+    return value
 
 
 def _require_list(data: dict[str, object], key: str, context: str = "") -> list[object]:

@@ -1,7 +1,6 @@
 import torch
-import torch.nn as nn
 from jaxtyping import Float
-from torch import Tensor
+from torch import Tensor, nn
 
 from imaged.core.forward import FPMForwardModel, SpectralWindow
 from imaged.core.nuisance import Backgrounds
