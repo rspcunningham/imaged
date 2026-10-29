@@ -25,17 +25,6 @@ class ValidatedDataset:
     total_bytes: int
 
 
-def normalize_dataset_id(dataset_id: str) -> str:
-    normalized = dataset_id.strip()
-    if not normalized:
-        raise DatasetValidationError("Dataset name must not be empty")
-    if "/" in normalized or "\\" in normalized:
-        raise DatasetValidationError("Dataset name must be a flat directory name")
-    if normalized in {".", "..", ".staging"}:
-        raise DatasetValidationError("Dataset name must be a normal directory name")
-    return normalized
-
-
 def load_manifest(path: str | Path) -> StudyManifest:
     manifest_path = Path(path)
     try:

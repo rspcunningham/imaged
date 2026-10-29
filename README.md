@@ -23,7 +23,26 @@ datasets/my-study/
     └── *.npy
 ```
 
-Each capture is a raw 2D Bayer image stored as a NumPy array. The manifest describes the optics, exposure times, illumination positions, and optional dark captures; see the [dataset schema](INFO_JSON_SCHEMA.md) for the full format. Datasets are kept outside version control.
+Each capture is a raw 2D Bayer image stored as a NumPy array. The manifest describes the optics, exposure times, illumination positions, and optional dark captures; see the [dataset schema](INFO_JSON_SCHEMA.md) for the full format. Datasets are stored locally under `datasets/` and kept outside version control. `datasets/` mirrors the Hugging Face dataset [rspcunningham/imaged-data](https://huggingface.co/datasets/rspcunningham/imaged-data). Download it, or one study, with:
+
+```sh
+hf download rspcunningham/imaged-data --repo-type dataset --local-dir datasets
+hf download rspcunningham/imaged-data --repo-type dataset --local-dir datasets --include "20260728-122052-usaf-g9/*"
+```
+
+Push local changes back to the Hub (only changed files are uploaded; files removed locally are removed from the Hub):
+
+```sh
+hf upload rspcunningham/imaged-data datasets . --repo-type dataset --delete "*"
+```
+
+Validate a dataset before reconstruction:
+
+```sh
+uv run imaged-dataset validate datasets/my-study
+```
+
+Each study contains one wavelength. The colour acquisition is split into independent studies at `datasets/20250821-160234-usaf-g9-colour-red`, `-green`, and `-blue`.
 
 In [reconstruction.py](reconstruction.py), set `dataset` to your dataset directory and choose the crop, patch size, number of epochs, and learning rates. Then run:
 
@@ -41,7 +60,7 @@ Each run writes to `results/<dataset-name>-<timestamp>/`:
 
 ## Library usage
 
-`PtychStudy.load` accepts a local dataset directory or a dataset ID from the configured Nextcloud share. Remote datasets are downloaded and cached in `~/.cache/imaged/datasets`.
+`PtychStudy.load` accepts a local dataset directory. Relative paths are resolved from the current working directory; missing directories raise a dataset validation error.
 
 ```python
 from imaged import PtychStudy, solve_study

@@ -46,16 +46,9 @@ class PtychStudy:
         crop: ImageCrop | None = None,
         dark_subtraction: DarkSubtraction = "average_all",
     ) -> "PtychStudy":
-        candidate_path = Path(dataset)
-        if candidate_path.exists():
-            dir_path = candidate_path
-        else:
-            from imaged.data.download.dataset_cache import NextcloudDatasetCache
-
-            cache = NextcloudDatasetCache()
-            dir_path = cache.fetch_dataset(str(dataset))
-
-        dataset_validation = validate_dataset(dir_path)
+        """Load and preprocess a local dataset directory."""
+        dataset_validation = validate_dataset(dataset)
+        dir_path = dataset_validation.root
         manifest = dataset_validation.manifest
         expected_shape = (
             manifest.capture_dimensions.height,

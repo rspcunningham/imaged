@@ -9,7 +9,7 @@ from imaged.core.metric_plots import save_metrics_summary
 from imaged.data.utils import get_default_device
 
 # Select dataset
-dataset = "datasets/20260728-122052-Bar Pattern"
+dataset = "datasets/20260728-122052-usaf-g9"
 
 CROP_SIZE = 616  # 616px window in the 1232x1232 frame
 CROP_TOP = 0
