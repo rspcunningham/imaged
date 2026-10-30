@@ -3,7 +3,7 @@
 compute runs the image-eval CLI on the centre-LED capture (the base image, which
 mtf_template.json is drawn on) and on the hero reconstruction, and keeps its raw JSON
 reports. render plots straight from those reports. The NPS is from the flat black
-region, each image out to its own sampling Nyquist.
+region, each image out to its own sampling Nyquist, relative to the capture's mean NPS.
 """
 
 import json
@@ -21,7 +21,6 @@ RUN = "bar-single-patch"
 TEMPLATE = ROOT / "figures" / "mtf_template.json"
 # image-eval lives in a sibling checkout; run it from there so local changes apply.
 IMAGE_EVAL = ["uv", "run", "--project", str(ROOT.parent / "image-eval"), "image-eval"]
-NPS_SCALE = 1e-11  # axis unit; image-eval reports NPS in intensity^2 mm^2
 
 
 def compute() -> None:
@@ -80,6 +79,14 @@ def trend(points: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     )
 
 
+def nps_curve(report: dict) -> tuple[np.ndarray, np.ndarray]:
+    """(cycles/mm, NPS) of the flat black region, in intensity^2 mm^2."""
+    rows = report["nps"]["rows"]
+    return np.array([r["frequency"] for r in rows]), np.array(
+        [np.nan if r["black_nps"] is None else r["black_nps"] for r in rows]
+    )
+
+
 def render() -> None:
     style.apply()
     fig, (mtf_ax, nps_ax) = plt.subplots(
@@ -90,6 +97,7 @@ def render() -> None:
         ("capture", "one capture", style.INK_MUTED, (262, 0.25), "right"),
         ("reconstruction", "reconstruction", style.SIGNAL, (420, 0.47), "left"),
     )
+    reference = np.nanmean(nps_curve(load_report("capture"))[1])
     for name, label, color, (x, y), ha in series:
         report = load_report(name)
         points = mtf_points(report)
@@ -99,21 +107,28 @@ def render() -> None:
         mtf_ax.plot(*trend(points), color=color, lw=1.4, solid_capstyle="round")
         mtf_ax.text(x, y, label, color=color, fontsize=8, ha=ha, va="center")
 
-        rows = report["nps"]["rows"]
-        f = np.array([r["frequency"] for r in rows])
-        nps = np.array(
-            [np.nan if r["black_nps"] is None else r["black_nps"] for r in rows]
-        )
-        nps_ax.plot(f, nps / NPS_SCALE, color=color, lw=1.4, solid_capstyle="round")
+        f, nps = nps_curve(report)
+        nps_ax.plot(f, nps / reference, color=color, lw=1.4, solid_capstyle="round")
 
     mtf_ax.set_xlabel("spatial frequency (cycles/mm)")
     mtf_ax.set_ylabel("MTF")
     mtf_ax.set_ylim(0, 0.8)
     nps_ax.set_xlabel("spatial frequency (cycles/mm)")
-    nps_ax.set_ylabel("NPS (10$^{-11}$ intensity$^2$ mm$^2$)")
-    nps_ax.set_xlim(0, None)
+    nps_ax.set_ylabel("noise power (relative to one capture)")
+    nps_ax.set_xlim(0, 2000)
     nps_ax.set_ylim(0, None)
-    for ax in (mtf_ax, nps_ax):
+    # USAF bar width in µm along the top: one cycle is a bar and a gap.
+    for ax, widths in ((mtf_ax, [2, 1.5, 1, 0.75]), (nps_ax, [2, 1, 0.5, 0.25])):
         ax.tick_params(labelfontfamily="Geist Mono")
+        top = ax.secondary_xaxis(
+            "top",
+            functions=(
+                lambda f: 500 / np.maximum(f, 1e-9),
+                lambda w: 500 / np.maximum(w, 1e-9),
+            ),
+        )
+        top.set_xticks(widths, labels=[f"{w:g}" for w in widths])
+        top.set_xlabel("bar width (µm)")
+        top.tick_params(labelfontfamily="Geist Mono")
     fig.savefig(figure_path(NAME))
     plt.close(fig)
