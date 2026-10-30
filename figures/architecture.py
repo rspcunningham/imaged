@@ -6,6 +6,7 @@ anything gradient descent updates is filled.
 """
 
 import matplotlib.pyplot as plt
+import numpy as np
 from matplotlib.patches import FancyBboxPatch
 
 from figures import style
@@ -44,18 +45,37 @@ def draw(full: bool) -> None:
         ax.text(x, y, text, ha="center", va="center", fontsize=7.5)
 
     def arrow(start, end, color: str = style.RING, dashed: bool = False) -> None:
+        head = "-|>,head_length=0.35,head_width=0.18"
+        props = {"color": color, "lw": 0.8, "shrinkA": 0, "shrinkB": 0}
+        if not dashed:
+            ax.annotate(
+                "", xy=end, xytext=start, arrowprops={"arrowstyle": head, **props}
+            )
+            return
+        # A dash pattern also strokes the head's outline, notching it into what reads
+        # as two stacked heads. Dash the shaft only, stopping at the head (3.5 pt
+        # long at the default mutation scale), and draw the head solid on its own.
         ax.annotate(
             "",
             xy=end,
             xytext=start,
-            arrowprops={
-                "arrowstyle": "-|>,head_length=0.35,head_width=0.18",
-                "color": color,
-                "lw": 0.8,
-                "ls": (0, (3, 2)) if dashed else "-",
-                "shrinkA": 0,
-                "shrinkB": 0,
-            },
+            arrowprops={"arrowstyle": "-", "ls": (0, (3, 2)), **props, "shrinkB": 3.5},
+        )
+        # The head's own path must be at least as long as the head, or matplotlib
+        # bends its tip past the end point; size it in data units once the equal
+        # aspect has fixed the scale.
+        ax.apply_aspect()
+        points_per_unit = (
+            (ax.transData.transform((1, 0))[0] - ax.transData.transform((0, 0))[0])
+            * 72
+            / fig.dpi
+        )
+        direction = np.subtract(end, start) / np.hypot(*np.subtract(end, start))
+        ax.annotate(
+            "",
+            xy=end,
+            xytext=np.subtract(end, 4 / points_per_unit * direction),
+            arrowprops={"arrowstyle": head, **props},
         )
 
     # The gradient bus runs just above the highest learned block, so the naive
