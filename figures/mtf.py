@@ -7,6 +7,7 @@ region, each image out to its own sampling Nyquist, relative to the capture's me
 """
 
 import json
+import shutil
 import subprocess
 
 import matplotlib.pyplot as plt
@@ -19,11 +20,25 @@ from imaged import PtychStudy
 NAME = "mtf"
 RUN = "bar-single-patch"
 TEMPLATE = ROOT / "figures" / "mtf_template.json"
-# image-eval lives in a sibling checkout; run it from there so local changes apply.
-IMAGE_EVAL = ["uv", "run", "--project", str(ROOT.parent / "image-eval"), "image-eval"]
+IMAGE_EVAL_VERSION = "0.2.1"
+IMAGE_EVAL_INSTALL = (
+    "uv tool install --force "
+    f"git+https://github.com/rspcunningham/image-eval@v{IMAGE_EVAL_VERSION}"
+)
 
 
 def compute() -> None:
+    installed = (
+        subprocess.run(
+            ["image-eval", "--version"], check=True, capture_output=True, text=True
+        ).stdout.strip()
+        if shutil.which("image-eval")
+        else None
+    )
+    assert installed == IMAGE_EVAL_VERSION, (
+        f"figure 7 needs image-eval {IMAGE_EVAL_VERSION}, found {installed}. "
+        f"Install it with: {IMAGE_EVAL_INSTALL}"
+    )
     directory = OUT / NAME
     directory.mkdir(parents=True, exist_ok=True)
     study = PtychStudy.load(ROOT / DATASETS["bar"][0])
@@ -34,7 +49,7 @@ def compute() -> None:
     for name, subject in (("capture", base), ("reconstruction", reconstruction)):
         report = subprocess.run(
             [
-                *IMAGE_EVAL,
+                "image-eval",
                 "eval",
                 "--base-url",
                 str(base),
